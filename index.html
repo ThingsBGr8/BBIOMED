@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-BIOMED Semester Planner - Curtin University</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            background: #34495e;
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-right: 1px solid #7f8c8d;
+            position: relative;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: #2c3e50;
+            color: #ecf0f1;
+            box-shadow: 0 3px 0 0 #3498db;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: #3498db;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+
+        .tab.active::before {
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .major-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .major-title {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .unit-card {
+            border: 2px solid #ecf0f1;
+            border-radius: 5px;
+            padding: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .unit-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .unit-card.selected {
+            border-color: #2ecc71;
+            background-color: #d5f4e6;
+        }
+
+        .unit-card.completed {
+            border-color: #9b59b6;
+            background-color: #f4e8ff;
+        }
+
+        .unit-code {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .unit-name {
+            font-size: 14px;
+            margin: 5px 0;
+            color: #34495e;
+            line-height: 1.3;
+        }
+
+        .prerequisites {
+            font-size: 11px;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .semester-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #3498db;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        .status-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .status-selected { background: #2ecc71; color: white; }
+        .status-completed { background: #9b59b6; color: white; }
+
+        .controls {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .controls h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: #3498db; color: white; }
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-secondary { background: #95a5a6; color: white; }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn.active-mode {
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        .summary-panel {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .warning {
+            background: #f39c12;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #2ecc71;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .info {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        /* Planning interface styles */
+        .planning-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 70vh;
+        }
+
+        .available-units {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .semester-grid {
+            display: grid;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .year-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+
+        .year-title {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            background: #3498db;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .semester-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .semester-column {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            min-height: 150px;
+        }
+
+        .semester-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            background: #e9ecef;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .semester-dropzone {
+            min-height: 100px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .semester-dropzone.drag-over {
+            border-color: #3498db;
+            background-color: #e8f4fd;
+        }
+
+        .planned-unit {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 5px;
+            margin: 3px 0;
+            font-size: 11px;
+            cursor: move;
+        }
+
+        .planned-unit:hover {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .planned-unit.invalid-placement {
+            border: 2px solid #e74c3c;
+            background-color: #fdf2f2;
+        }
+
+        .available-units-dropzone {
+            min-height: 200px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 5px;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+
+        .available-units-dropzone.drag-over {
+            border-color: #2ecc71;
+            background-color: #e8f8f5;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bachelor of Biomedical Sciences (B-BIOMED) Semester Planner</h1>
+            <p>Plan your flexible study pathway | Curtin University 2025</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('unit-selection')">Unit Selection</button>
+            <button class="tab" onclick="showTab('semester-planning')">Semester Planning</button>
+            <button class="tab" onclick="showTab('summary')">Study Plan Summary</button>
+        </div>
+
+        <!-- Unit Selection Tab -->
+        <div id="unit-selection" class="tab-content active">
+            <div class="controls">
+                <h3>Study Status Controls</h3>
+                <div class="control-row">
+                    <button class="btn btn-success" id="btn-completed" onclick="setMode('completed')">Mark as Completed (Credit Transfer)</button>
+                    <button class="btn btn-primary active-mode" id="btn-selected" onclick="setMode('selected')">Add to Study Plan</button>
+                    <button class="btn btn-secondary" id="btn-remove" onclick="setMode('remove')">Remove from Plan</button>
+                    <button class="btn btn-danger" onclick="clearAllSelections()">Clear All</button>
+                </div>
+                <div class="info">
+                    <strong>Instructions:</strong> Click a button above, then click units to change their status. 
+                    Purple = Completed, Green = In Study Plan, Gray = Not Selected
+                </div>
+            </div>
+
+            <div class="summary-panel">
+                <h3>Study Plan Progress</h3>
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="completed-count">0</div>
+                        <div class="stat-label">Completed Units</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="planned-count">0</div>
+                        <div class="stat-label">Planned Units</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="remaining-count">24</div>
+                        <div class="stat-label">Units Remaining</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-semesters">0</div>
+                        <div class="stat-label">Estimated Semesters</div>
+                    </div>
+                </div>
+                <div id="messages"></div>
+            </div>
+
+            <div class="section">
+                <h2>Core Units - Year 1 (All Required - 8 units)</h2>
+                <div class="units-grid" id="core-units"></div>
+            </div>
+
+            <div class="section">
+                <h2>Major Units (Choose 1 or 2 Majors - 8 units each)</h2>
+                <div id="major-units"></div>
+            </div>
+
+            <div class="section">
+                <h2>Internal Specializations (Choose 1 or 2 - 4 units each)</h2>
+                <div id="internal-specializations"></div>
+            </div>
+
+            <div class="section">
+                <h2>External Specializations (Choose 1 Only - 4 units each)</h2>
+                <div id="external-specializations"></div>
+            </div>
+
+            <div class="section">
+                <h2>Additional Option Units</h2>
+                <div class="units-grid" id="option-units"></div>
+            </div>
+        </div>
+
+        <!-- Semester Planning Tab -->
+        <div id="semester-planning" class="tab-content">
+            <div class="controls">
+                <h3>Semester Planning Tools</h3>
+                <div class="control-row">
+                    <button class="btn btn-primary" onclick="addYear()">Add Year</button>
+                    <button class="btn btn-warning" onclick="removeLastYear()">Remove Last Year</button>
+                    <button class="btn btn-secondary" onclick="autoArrange()">Auto-Arrange by Prerequisites</button>
+                    <span style="margin-left: 20px; color: #7f8c8d;">Currently showing ${maxYears} years</span>
+                </div>
+                <div class="info">
+                    <strong>Instructions:</strong> Drag units from the left panel into semester slots. Units show their available semesters.
+                    <br><strong>Remove units:</strong> Drag them back to the "Available Units" area on the left.
+                    <br><strong>Prerequisite validation:</strong> Units will be checked to ensure prerequisites are completed in earlier semesters.
+                </div>
+            </div>
+
+            <div class="planning-container">
+                <div class="available-units">
+                    <h3>Available Units</h3>
+                    <div class="available-units-dropzone" id="available-units-dropzone">
+                        <div id="available-units-list">
+                            <div class="info">Select units in the Unit Selection tab first, then they will appear here for planning.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="semester-grid" id="semester-grid">
+                    <!-- Semester blocks will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-content">
+            <div class="controls">
+                <h3>Export & Save Options</h3>
+                <div class="control-row">
+                    <button class="btn btn-primary" onclick="exportPlan()">Export Study Plan</button>
+                    <button class="btn btn-success" onclick="savePlan()">Save Plan Locally</button>
+                    <button class="btn btn-warning" onclick="loadPlan()">Load Saved Plan</button>
+                </div>
+            </div>
+
+            <div id="plan-summary">
+                <!-- Plan summary will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const courseData = {
+            core: [
+                { code: "MEDI1000", name: "Foundations of Biomedical Science", prerequisites: [], semesters: ["S1"] },
+                { code: "BIOL1004", name: "Foundations of Bioscience Practice", prerequisites: [], semesters: ["S1"] },
+                { code: "HUMB1000", name: "Human Structure and Function", prerequisites: [], semesters: ["S1", "S2"] },
+                { code: "CHEM1007", name: "Fundamental Chemistry for Biosciences", prerequisites: [], semesters: ["S1"] },
+                { code: "INDH1006", name: "Indigenous Cultures and Health Behaviours", prerequisites: [], semesters: ["S1", "S2"] },
+                { code: "EPID1000", name: "Foundations of Biostatistics and Epidemiology", prerequisites: [], semesters: ["S1", "S2"] },
+                { code: "HUMB1001", name: "Integrated Systems Anatomy and Physiology", prerequisites: ["HUMB1000"], semesters: ["S1", "S2"] },
+                { code: "GENE1000", name: "Molecular Genetics and Cell Biology", prerequisites: [], semesters: ["S2"] }
+            ],
+            majors: {
+                "Pharmacology Major": [
+                    { code: "PHRM1000", name: "Foundations of Pharmaceutical Sciences", prerequisites: ["BIOL1004", "CHEM1007"], semesters: ["S1"] },
+                    { code: "PHRM2005", name: "Foundations in Pharmacology", prerequisites: ["MEDI1000"], semesters: ["S1"] },
+                    { code: "PHRM2006", name: "Pharmacology Principles", prerequisites: ["PHRM2005"], semesters: ["S2"] },
+                    { code: "CHEM1006", name: "Pharmaceutical Chemistry", prerequisites: ["BCCB2000"], semesters: ["S2"] },
+                    { code: "IMED3010", name: "Systems Pharmacology", prerequisites: ["PHRM2006"], semesters: ["S1"] },
+                    { code: "IMED3009", name: "Pharmacology of Antimicrobial Agents", prerequisites: ["PHRM2005"], semesters: ["S1"] },
+                    { code: "IMED3008", name: "Advanced Pharmacology", prerequisites: ["IMED3010"], semesters: ["S2"] },
+                    { code: "PHRM3005", name: "Advanced Pharmacokinetics and Drug Bioanalysis", prerequisites: ["CHEM1006", "PHRM2006"], semesters: ["S2"] }
+                ],
+                "Molecular Genetics Major": [
+                    { code: "BCCB2000", name: "Foundations of Biochemistry", prerequisites: ["CHEM1007"], semesters: ["S1"] },
+                    { code: "MEDI2010", name: "Molecular Cytogenetics and Diagnostics", prerequisites: ["GENE1000"], semesters: ["S1"] },
+                    { code: "GENE2001", name: "Population Genetics and Molecular Evolution", prerequisites: ["GENE1000"], semesters: ["S2"] },
+                    { code: "BIOL2001", name: "Introduction to Bioinformatics", prerequisites: ["GENE1000"], semesters: ["S2"] },
+                    { code: "GENE3000", name: "Genetic Engineering", prerequisites: ["GENE1000"], semesters: ["S1"] },
+                    { code: "GENE3002", name: "Human Genetic Disease", prerequisites: ["GENE2001"], semesters: ["S1"] },
+                    { code: "BIOL3011", name: "Protein Structure and Interactions", prerequisites: ["BCCB2000", "BIOL2001"], semesters: ["S2"] },
+                    { code: "BIOL3010", name: "Biosciences Research Project", prerequisites: ["EPID1000"], semesters: ["S2"] }
+                ],
+                "Human Biomedicine Major": [
+                    { code: "BCCB2000", name: "Foundations of Biochemistry", prerequisites: ["CHEM1007"], semesters: ["S1"] },
+                    { code: "HUMB2013", name: "Trunk Anatomy and Embryology", prerequisites: ["HUMB1001"], semesters: ["S1"] },
+                    { code: "HUMB2012", name: "Physiological Processes", prerequisites: ["HUMB1001"], semesters: ["S2"] },
+                    { code: "HUMB2011", name: "Limb Anatomy and Biomechanics", prerequisites: ["HUMB1001"], semesters: ["S2"] },
+                    { code: "HUMB3009", name: "Neuroanatomy", prerequisites: ["HUMB1001"], semesters: ["S1"] },
+                    { code: "HUMB2014", name: "Vital Physiology", prerequisites: ["HUMB1001"], semesters: ["S1"] },
+                    { code: "HUMB3003", name: "Neuroscience", prerequisites: ["HUMB3009"], semesters: ["S2"] },
+                    { code: "BIOL3010", name: "Biosciences Research Project", prerequisites: ["EPID1000"], semesters: ["S2"] }
+                ]
+            },
+            internalSpecializations: {
+                "Pharmacology Specialisation": [
+                    { code: "PHRM1000", name: "Foundations of Pharmaceutical Sciences", prerequisites: ["BIOL1004", "CHEM1007"], semesters: ["S1"] },
+                    { code: "PHRM2006", name: "Pharmacology Principles", prerequisites: ["PHRM2005"], semesters: ["S2"] },
+                    { code: "IMED3010", name: "Systems Pharmacology", prerequisites: ["PHRM2006"], semesters: ["S1"] },
+                    { code: "IMED3008", name: "Advanced Pharmacology", prerequisites: ["IMED3010"], semesters: ["S2"] }
+                ],
+                "Human Genetics and Genomics": [
+                    { code: "MEDI2010", name: "Molecular Cytogenetics and Diagnostics", prerequisites: ["GENE1000"], semesters: ["S1"] },
+                    { code: "GENE2001", name: "Population Genetics and Molecular Evolution", prerequisites: ["GENE1000"], semesters: ["S2"] },
+                    { code: "GENE3002", name: "Human Genetic Disease", prerequisites: ["GENE2001"], semesters: ["S1"] },
+                    { code: "BIOL2001", name: "Introduction to Bioinformatics", prerequisites: ["GENE1000"], semesters: ["S2"] }
+                ],
+                "Human Pathology": [
+                    { code: "PATH2001", name: "Foundations of Pathology", prerequisites: ["HUMB1001", "MEDI1000"], semesters: ["S1"] },
+                    { code: "MEDI2000", name: "Foundations of Immunobiology", prerequisites: ["MEDI1000", "HUMB1001"], semesters: ["S2"] },
+                    { code: "MEDI3017", name: "Medical Pathophysiology", prerequisites: ["HUMB2012"], semesters: ["S1"] },
+                    { code: "HUMB3008", name: "Clinical Neurophysiology", prerequisites: ["HUMB2012", "HUMB3009"], semesters: ["S2"] }
+                ],
+                "Microbiology": [
+                    { code: "MEDI2009", name: "Investigations in Infectious Microbiology", prerequisites: ["MEDI1000"], semesters: ["S1"] },
+                    { code: "MICB2001", name: "Translational Microbiology", prerequisites: ["MEDI1000"], semesters: ["S2"] },
+                    { code: "MICB3000", name: "Molecular Virology", prerequisites: ["MEDI2009"], semesters: ["S1"] },
+                    { code: "MICB3002", name: "Advances in Molecular Microbiology", prerequisites: ["MEDI2009"], semesters: ["S2"] }
+                ],
+                "Immunology and Cell Biology": [
+                    { code: "BCCB2004", name: "Foundations of Cell Biology", prerequisites: ["BCCB2000"], semesters: ["S1"] },
+                    { code: "MEDI2000", name: "Foundations of Immunobiology", prerequisites: ["MEDI1000", "HUMB1001"], semesters: ["S2"] },
+                    { code: "MEDI3016", name: "Frontiers in Immunology", prerequisites: ["MEDI2000"], semesters: ["S1"] },
+                    { code: "BCCB3001", name: "Frontiers in Cell Biology", prerequisites: ["BCCB2004"], semesters: ["S2"] }
+                ]
+            },
+            externalSpecializations: {
+                "Corporate Governance": [
+                    { code: "BLAW2011", name: "Safety and Environmental Health", prerequisites: [], semesters: ["S1", "S2"] },
+                    { code: "BLAW2006", name: "Company Law for Business", prerequisites: [], semesters: ["S1", "S2"] },
+                    { code: "BLAW3004", name: "Business Intellectual Property", prerequisites: [], semesters: ["S1", "S2"] },
+                    { code: "BLAW1006", name: "Introduction to Business Law", prerequisites: [], semesters: ["S1", "S2"] }
+                ],
+                "Digital and Social Media": [
+                    { code: "NETS1000", name: "Digital Culture and Everyday Life", prerequisites: [], semesters: ["S1", "S2"] },
+                    { code: "NETS2002", name: "Social Media, Communities and Networks", prerequisites: [], semesters: ["S1", "S2"] },
+                    { code: "NETS2003", name: "The Digital Economy", prerequisites: [], semesters: ["S1", "S2"] },
+                    { code: "NETS3000", name: "Online Power and Resistance", prerequisites: [], semesters: ["S1", "S2"] }
+                ]
+            },
+            optionUnits: [
+                { code: "BIOL2004", name: "Research Skills for Biomedical Sciences", prerequisites: ["BIOL1004"], semesters: ["S2"] },
+                { code: "PSYC1000", name: "Introduction to Psychology", prerequisites: [], semesters: ["S1"] },
+                { code: "MEDS3005", name: "Human Reproductive Science", prerequisites: ["BCCB2000", "HUMB1001"], semesters: ["S2"] },
+                { code: "BIOL3002", name: "Understanding Biotechnology", prerequisites: ["GENE1000"], semesters: ["S2"] },
+                { code: "BIOL3009", name: "Advanced Molecular Techniques", prerequisites: [], semesters: ["S1"] },
+                { code: "FORS2000", name: "Forensic Trace Evidence", prerequisites: ["GENE1000"], semesters: ["S1"] },
+                { code: "FORS3001", name: "Forensic Case Studies", prerequisites: ["FORS2000"], semesters: ["S2"] },
+                { code: "PHYS1006", name: "Foundations of Physics", prerequisites: [], semesters: ["S1", "S2"] }
+            ]
+        };
+
+        let unitStatuses = {};
+        let currentMode = 'selected';
+        let semesterPlan = {};
+        let maxYears = 6; // Increased default years
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'semester-planning') {
+                loadSemesterPlanning();
+            } else if (tabName === 'summary') {
+                loadSummary();
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update button styles safely
+            const buttons = document.querySelectorAll('.control-row .btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active-mode');
+            });
+            
+            if (mode === 'completed') {
+                document.getElementById('btn-completed').classList.add('active-mode');
+            } else if (mode === 'selected') {
+                document.getElementById('btn-selected').classList.add('active-mode');
+            } else if (mode === 'remove') {
+                document.getElementById('btn-remove').classList.add('active-mode');
+            }
+        }
+
+        function createUnitCard(unit) {
+            const card = document.createElement('div');
+            card.className = 'unit-card';
+            
+            const status = unitStatuses[unit.code];
+            if (status) {
+                card.classList.add(status);
+            }
+            
+            card.innerHTML = `
+                <div class="semester-badge">${unit.semesters.join(', ')}</div>
+                <div class="unit-code">${unit.code}</div>
+                <div class="unit-name">${unit.name}</div>
+                <div class="prerequisites">
+                    Prerequisites: ${unit.prerequisites.length ? unit.prerequisites.join(', ') : 'None'}
+                </div>
+                ${status ? `<div class="status-badge status-${status}">${status.toUpperCase()}</div>` : ''}
+            `;
+            
+            card.addEventListener('click', () => toggleUnit(unit, card));
+            return card;
+        }
+
+        function toggleUnit(unit, card) {
+            const currentStatus = unitStatuses[unit.code];
+            
+            if (currentMode === 'remove') {
+                delete unitStatuses[unit.code];
+                card.className = 'unit-card';
+                const badge = card.querySelector('.status-badge');
+                if (badge) badge.remove();
+            } else if (currentStatus === currentMode) {
+                delete unitStatuses[unit.code];
+                card.className = 'unit-card';
+                const badge = card.querySelector('.status-badge');
+                if (badge) badge.remove();
+            } else {
+                unitStatuses[unit.code] = currentMode;
+                card.className = `unit-card ${currentMode}`;
+                
+                let badge = card.querySelector('.status-badge');
+                if (badge) {
+                    badge.textContent = currentMode.toUpperCase();
+                    badge.className = `status-badge status-${currentMode}`;
+                } else {
+                    badge = document.createElement('div');
+                    badge.className = `status-badge status-${currentMode}`;
+                    badge.textContent = currentMode.toUpperCase();
+                    card.appendChild(badge);
+                }
+            }
+            
+            updateSummaryStats();
+            checkPrerequisites();
+        }
+
+        function updateSummaryStats() {
+            const completed = Object.values(unitStatuses).filter(s => s === 'completed').length;
+            const planned = Object.values(unitStatuses).filter(s => s === 'selected').length;
+            const remaining = 24 - completed - planned;
+            const estimatedSemesters = planned > 0 ? Math.ceil(planned / 3) : 0;
+            
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('planned-count').textContent = planned;
+            document.getElementById('remaining-count').textContent = Math.max(0, remaining);
+            document.getElementById('total-semesters').textContent = estimatedSemesters;
+        }
+
+        function checkPrerequisites() {
+            const messagesElement = document.getElementById('messages');
+            const completedCodes = Object.keys(unitStatuses).filter(code => unitStatuses[code] === 'completed');
+            const selectedCodes = Object.keys(unitStatuses).filter(code => unitStatuses[code] === 'selected');
+            const allAvailableCodes = [...completedCodes, ...selectedCodes];
+            const warnings = [];
+            
+            selectedCodes.forEach(code => {
+                const unit = findUnitByCode(code);
+                if (unit) {
+                    const missingPrereqs = unit.prerequisites.filter(prereq => 
+                        !allAvailableCodes.includes(prereq)
+                    );
+                    
+                    if (missingPrereqs.length > 0) {
+                        warnings.push(`${unit.code} requires: ${missingPrereqs.join(', ')}`);
+                    }
+                }
+            });
+            
+            if (warnings.length > 0) {
+                messagesElement.innerHTML = `
+                    <div class="warning">
+                        <strong>⚠️ Prerequisite Warnings:</strong><br>
+                        ${warnings.join('<br>')}
+                    </div>
+                `;
+            } else if (selectedCodes.length > 0 || completedCodes.length > 0) {
+                messagesElement.innerHTML = `
+                    <div class="success">
+                        ✅ All prerequisites are satisfied!
+                    </div>
+                `;
+            } else {
+                messagesElement.innerHTML = '';
+            }
+        }
+
+        function findUnitByCode(code) {
+            const allUnits = [
+                ...courseData.core,
+                ...Object.values(courseData.majors).flat(),
+                ...Object.values(courseData.internalSpecializations).flat(),
+                ...Object.values(courseData.externalSpecializations).flat(),
+                ...courseData.optionUnits
+            ];
+            return allUnits.find(unit => unit.code === code);
+        }
+
+        function clearAllSelections() {
+            unitStatuses = {};
+            semesterPlan = {};
+            
+            document.querySelectorAll('.unit-card').forEach(card => {
+                card.className = 'unit-card';
+                const badge = card.querySelector('.status-badge');
+                if (badge) badge.remove();
+            });
+            
+            updateSummaryStats();
+            checkPrerequisites();
+        }
+
+        function loadSemesterPlanning() {
+            generateSemesterGrid();
+            loadAvailableUnits();
+            validateAllPrerequisites();
+        }
+
+        function generateSemesterGrid() {
+            const grid = document.getElementById('semester-grid');
+            grid.innerHTML = '';
+            
+            for (let year = 1; year <= maxYears; year++) {
+                const yearSection = document.createElement('div');
+                yearSection.className = 'year-section';
+                
+                const yearTitle = document.createElement('div');
+                yearTitle.className = 'year-title';
+                yearTitle.textContent = `Year ${year}`;
+                yearSection.appendChild(yearTitle);
+                
+                const semesterRow = document.createElement('div');
+                semesterRow.className = 'semester-row';
+                
+                ['S1', 'S2'].forEach(semester => {
+                    const semesterColumn = document.createElement('div');
+                    semesterColumn.className = 'semester-column';
+                    
+                    const semesterTitle = document.createElement('div');
+                    semesterTitle.className = 'semester-title';
+                    semesterTitle.textContent = `Semester ${semester.slice(1)}`;
+                    semesterColumn.appendChild(semesterTitle);
+                    
+                    const dropzone = document.createElement('div');
+                    dropzone.className = 'semester-dropzone';
+                    dropzone.dataset.year = year;
+                    dropzone.dataset.semester = semester;
+                    
+                    dropzone.addEventListener('dragover', handleDragOver);
+                    dropzone.addEventListener('drop', handleDrop);
+                    dropzone.addEventListener('dragleave', handleDragLeave);
+                    
+                    if (semesterPlan[year] && semesterPlan[year][semester]) {
+                        semesterPlan[year][semester].forEach(unitCode => {
+                            const unit = findUnitByCode(unitCode);
+                            if (unit) {
+                                const plannedUnit = createPlannedUnit(unit, year, semester);
+                                dropzone.appendChild(plannedUnit);
+                            }
+                        });
+                    }
+                    
+                    semesterColumn.appendChild(dropzone);
+                    semesterRow.appendChild(semesterColumn);
+                });
+                
+                yearSection.appendChild(semesterRow);
+                grid.appendChild(yearSection);
+            }
+        }
+
+        function loadAvailableUnits() {
+            const container = document.getElementById('available-units-list');
+            container.innerHTML = '';
+            
+            const selectedCodes = Object.keys(unitStatuses).filter(code => unitStatuses[code] === 'selected');
+            const plannedCodes = Object.values(semesterPlan).flatMap(year => 
+                Object.values(year || {}).flat()
+            );
+            
+            const availableUnits = selectedCodes.filter(code => !plannedCodes.includes(code));
+            
+            if (availableUnits.length === 0) {
+                container.innerHTML = '<div class="info">No units available for planning. Units you place in semesters can be dragged back here.</div>';
+            } else {
+                availableUnits.forEach(code => {
+                    const unit = findUnitByCode(code);
+                    if (unit) {
+                        const availableUnit = createAvailableUnit(unit);
+                        container.appendChild(availableUnit);
+                    }
+                });
+            }
+
+            // Add drop functionality to available units area
+            const dropzone = document.getElementById('available-units-dropzone');
+            dropzone.addEventListener('dragover', handleAvailableDragOver);
+            dropzone.addEventListener('drop', handleAvailableDrop);
+            dropzone.addEventListener('dragleave', handleAvailableDragLeave);
+        }
+
+        function createAvailableUnit(unit) {
+            const div = document.createElement('div');
+            div.className = 'planned-unit';
+            div.draggable = true;
+            div.dataset.unitCode = unit.code;
+            
+            div.innerHTML = `
+                <div style="font-weight: bold; font-size: 12px;">${unit.code}</div>
+                <div style="font-size: 11px; margin: 2px 0;">${unit.name}</div>
+                <div style="font-size: 10px; color: #7f8c8d;">Available: ${unit.semesters.join(', ')}</div>
+            `;
+            
+            div.addEventListener('dragstart', handleDragStart);
+            return div;
+        }
+
+        function createPlannedUnit(unit, year, semester) {
+            const div = document.createElement('div');
+            div.className = 'planned-unit';
+            div.draggable = true;
+            div.dataset.unitCode = unit.code;
+            div.dataset.year = year;
+            div.dataset.semester = semester;
+            
+            div.innerHTML = `
+                <div style="font-weight: bold; font-size: 12px;">${unit.code}</div>
+                <div style="font-size: 11px;">${unit.name}</div>
+            `;
+            
+            div.addEventListener('dragstart', handleDragStart);
+            return div;
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.unitCode);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const unitCode = e.dataTransfer.getData('text/plain');
+            const unit = findUnitByCode(unitCode);
+            const year = parseInt(e.currentTarget.dataset.year);
+            const semester = e.currentTarget.dataset.semester;
+            
+            if (!unit) {
+                document.querySelector('.dragging')?.classList.remove('dragging');
+                return;
+            }
+            
+            // Check if unit is available in this semester
+            if (!unit.semesters.includes(semester)) {
+                alert(`${unit.code} is not available in ${semester}. Available in: ${unit.semesters.join(', ')}`);
+                document.querySelector('.dragging')?.classList.remove('dragging');
+                return;
+            }
+            
+            // Check prerequisites timing
+            const prereqCheck = checkPrerequisiteTiming(unit, year, semester);
+            if (!prereqCheck.valid) {
+                const proceed = confirm(`⚠️ Prerequisite Timing Issue:\n\n${prereqCheck.message}\n\nDo you want to place this unit anyway? You may need to rearrange other units to satisfy prerequisites.`);
+                if (!proceed) {
+                    document.querySelector('.dragging')?.classList.remove('dragging');
+                    return;
+                }
+            }
+            
+            const draggingElement = document.querySelector('.dragging');
+            if (draggingElement) {
+                // Remove from previous location if it was in a semester
+                const oldYear = draggingElement.dataset.year;
+                const oldSemester = draggingElement.dataset.semester;
+                if (oldYear && oldSemester) {
+                    removePlannedUnit(unitCode, parseInt(oldYear), oldSemester);
+                }
+                
+                const plannedUnit = createPlannedUnit(unit, year, semester);
+                e.currentTarget.appendChild(plannedUnit);
+                
+                addPlannedUnit(unitCode, year, semester);
+                
+                draggingElement.remove();
+                loadAvailableUnits();
+                
+                // Validate all prerequisites after placement
+                validateAllPrerequisites();
+            }
+            
+            document.querySelector('.dragging')?.classList.remove('dragging');
+        }
+
+        function addPlannedUnit(unitCode, year, semester) {
+            if (!semesterPlan[year]) {
+                semesterPlan[year] = { S1: [], S2: [] };
+            }
+            if (!semesterPlan[year][semester].includes(unitCode)) {
+                semesterPlan[year][semester].push(unitCode);
+            }
+        }
+
+        function removePlannedUnit(unitCode, year, semester) {
+            if (semesterPlan[year] && semesterPlan[year][semester]) {
+                semesterPlan[year][semester] = semesterPlan[year][semester].filter(code => code !== unitCode);
+            }
+        }
+
+        function handleAvailableDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleAvailableDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleAvailableDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const unitCode = e.dataTransfer.getData('text/plain');
+            const draggingElement = document.querySelector('.dragging');
+            
+            if (draggingElement) {
+                // Remove from semester plan if it was there
+                const oldYear = draggingElement.dataset.year;
+                const oldSemester = draggingElement.dataset.semester;
+                if (oldYear && oldSemester) {
+                    removePlannedUnit(unitCode, parseInt(oldYear), oldSemester);
+                }
+                
+                draggingElement.remove();
+                loadAvailableUnits();
+                validateAllPrerequisites();
+            }
+            
+            document.querySelector('.dragging')?.classList.remove('dragging');
+        }
+
+        function checkPrerequisiteTiming(unit, targetYear, targetSemester) {
+            const completedUnits = Object.keys(unitStatuses).filter(code => unitStatuses[code] === 'completed');
+            const missingPrereqs = [];
+            
+            for (const prereqCode of unit.prerequisites) {
+                // Skip if already completed
+                if (completedUnits.includes(prereqCode)) {
+                    continue;
+                }
+                
+                // Find where this prerequisite is planned
+                let prereqFound = false;
+                let prereqYear = null;
+                let prereqSemester = null;
+                
+                for (const [year, semesters] of Object.entries(semesterPlan)) {
+                    for (const [semester, units] of Object.entries(semesters)) {
+                        if (units.includes(prereqCode)) {
+                            prereqFound = true;
+                            prereqYear = parseInt(year);
+                            prereqSemester = semester;
+                            break;
+                        }
+                    }
+                    if (prereqFound) break;
+                }
+                
+                if (!prereqFound) {
+                    missingPrereqs.push(`${prereqCode} (not scheduled)`);
+                    continue;
+                }
+                
+                // Check if prerequisite is scheduled before target unit
+                const isPrereqEarlier = (prereqYear < targetYear) || 
+                                       (prereqYear === targetYear && prereqSemester === 'S1' && targetSemester === 'S2');
+                
+                if (!isPrereqEarlier) {
+                    const prereqUnit = findUnitByCode(prereqCode);
+                    missingPrereqs.push(`${prereqCode} (scheduled in Year ${prereqYear} ${prereqSemester}, but needed before Year ${targetYear} ${targetSemester})`);
+                }
+            }
+            
+            if (missingPrereqs.length > 0) {
+                return {
+                    valid: false,
+                    message: `${unit.code} has prerequisite timing issues:\n\n${missingPrereqs.join('\n')}`
+                };
+            }
+            
+            return { valid: true };
+        }
+
+        function validateAllPrerequisites() {
+            // Clear previous error markings
+            document.querySelectorAll('.planned-unit').forEach(unit => {
+                unit.classList.remove('invalid-placement');
+                const errorDiv = unit.querySelector('.prerequisite-error');
+                if (errorDiv) errorDiv.remove();
+            });
+            
+            // Check all planned units
+            for (const [year, semesters] of Object.entries(semesterPlan)) {
+                for (const [semester, units] of Object.entries(semesters)) {
+                    units.forEach(unitCode => {
+                        const unit = findUnitByCode(unitCode);
+                        if (unit) {
+                            const prereqCheck = checkPrerequisiteTiming(unit, parseInt(year), semester);
+                            if (!prereqCheck.valid) {
+                                // Find the visual element and mark it as invalid
+                                const plannedElements = document.querySelectorAll(`.planned-unit[data-unit-code="${unitCode}"]`);
+                                plannedElements.forEach(element => {
+                                    if (element.dataset.year === year && element.dataset.semester === semester) {
+                                        element.classList.add('invalid-placement');
+                                        
+                                        const errorDiv = document.createElement('div');
+                                        errorDiv.className = 'prerequisite-error';
+                                        errorDiv.textContent = 'Prerequisite timing issue';
+                                        errorDiv.title = prereqCheck.message;
+                                        element.appendChild(errorDiv);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function addYear() {
+            maxYears++;
+            generateSemesterGrid();
+            
+            // Update the year counter display
+            const yearCounter = document.querySelector('.control-row span');
+            if (yearCounter) {
+                yearCounter.textContent = `Currently showing ${maxYears} years`;
+            }
+        }
+
+        function removeLastYear() {
+            if (maxYears > 1) {
+                const lastYearUnits = semesterPlan[maxYears];
+                if (lastYearUnits && (lastYearUnits.S1?.length > 0 || lastYearUnits.S2?.length > 0)) {
+                    if (!confirm('The last year has planned units. Remove anyway?')) {
+                        return;
+                    }
+                }
+                
+                delete semesterPlan[maxYears];
+                maxYears--;
+                generateSemesterGrid();
+                loadAvailableUnits();
+                
+                // Update the year counter display
+                const yearCounter = document.querySelector('.control-row span');
+                if (yearCounter) {
+                    yearCounter.textContent = `Currently showing ${maxYears} years`;
+                }
+            }
+        }
+
+        function autoArrange() {
+            alert('Auto-arrange feature coming soon! For now, please drag units manually into semesters.');
+        }
+
+        function loadSummary() {
+            const container = document.getElementById('plan-summary');
+            const completed = Object.keys(unitStatuses).filter(code => unitStatuses[code] === 'completed');
+            const planned = Object.keys(unitStatuses).filter(code => unitStatuses[code] === 'selected');
+            
+            let summaryHTML = `
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">${completed.length}</div>
+                        <div class="stat-label">Completed Units</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${planned.length}</div>
+                        <div class="stat-label">Planned Units</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${24 - completed.length - planned.length}</div>
+                        <div class="stat-label">Remaining Units</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${Object.keys(semesterPlan).length}</div>
+                        <div class="stat-label">Study Years</div>
+                    </div>
+                </div>
+            `;
+            
+            summaryHTML += '<h3>Study Plan Overview</h3>';
+            if (Object.keys(semesterPlan).length === 0) {
+                summaryHTML += '<div class="info">No semester plan created yet. Use the Semester Planning tab to arrange your units.</div>';
+            } else {
+                Object.keys(semesterPlan).sort((a, b) => parseInt(a) - parseInt(b)).forEach(year => {
+                    summaryHTML += `<h4>Year ${year}</h4>`;
+                    ['S1', 'S2'].forEach(semester => {
+                        const units = semesterPlan[year][semester] || [];
+                        if (units.length > 0) {
+                            summaryHTML += `
+                                <div class="major-section">
+                                    <div class="major-title">Semester ${semester.slice(1)} (${units.length} units)</div>
+                                    ${units.map(code => {
+                                        const unit = findUnitByCode(code);
+                                        return unit ? `<div>${unit.code} - ${unit.name}</div>` : '';
+                                    }).join('')}
+                                </div>
+                            `;
+                        }
+                    });
+                });
+            }
+            
+            container.innerHTML = summaryHTML;
+        }
+
+        function exportPlan() {
+            const planData = {
+                unitStatuses,
+                semesterPlan,
+                timestamp: new Date().toISOString(),
+                course: 'B-BIOMED'
+            };
+            
+            const dataStr = JSON.stringify(planData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `B-BIOMED-study-plan-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function savePlan() {
+            const planData = {
+                unitStatuses,
+                semesterPlan,
+                timestamp: new Date().toISOString()
+            };
+            
+            const planName = prompt('Enter a name for this study plan:', `Plan ${new Date().toLocaleDateString()}`);
+            
+            if (planName) {
+                planData.name = planName;
+                localStorage.setItem(`biomed-plan-${Date.now()}`, JSON.stringify(planData));
+                alert('Study plan saved successfully!');
+            }
+        }
+
+        function loadPlan() {
+            alert('Load plan feature coming soon!');
+        }
+
+        function loadUnits() {
+            // Load core units
+            const coreContainer = document.getElementById('core-units');
+            coreContainer.innerHTML = '';
+            courseData.core.forEach(unit => {
+                coreContainer.appendChild(createUnitCard(unit));
+            });
+
+            // Load major units
+            const majorContainer = document.getElementById('major-units');
+            majorContainer.innerHTML = '';
+            Object.keys(courseData.majors).forEach(majorName => {
+                const majorDiv = document.createElement('div');
+                majorDiv.className = 'major-section';
+                
+                const majorTitle = document.createElement('div');
+                majorTitle.className = 'major-title';
+                majorTitle.textContent = majorName;
+                majorDiv.appendChild(majorTitle);
+                
+                const unitsGrid = document.createElement('div');
+                unitsGrid.className = 'units-grid';
+                
+                courseData.majors[majorName].forEach(unit => {
+                    unitsGrid.appendChild(createUnitCard(unit));
+                });
+                
+                majorDiv.appendChild(unitsGrid);
+                majorContainer.appendChild(majorDiv);
+            });
+
+            // Load internal specializations
+            const internalSpecContainer = document.getElementById('internal-specializations');
+            internalSpecContainer.innerHTML = '';
+            Object.keys(courseData.internalSpecializations).forEach(specName => {
+                const specDiv = document.createElement('div');
+                specDiv.className = 'major-section';
+                
+                const specTitle = document.createElement('div');
+                specTitle.className = 'major-title';
+                specTitle.textContent = specName;
+                specDiv.appendChild(specTitle);
+                
+                const unitsGrid = document.createElement('div');
+                unitsGrid.className = 'units-grid';
+                
+                courseData.internalSpecializations[specName].forEach(unit => {
+                    unitsGrid.appendChild(createUnitCard(unit));
+                });
+                
+                specDiv.appendChild(unitsGrid);
+                internalSpecContainer.appendChild(specDiv);
+            });
+
+            // Load external specializations
+            const externalSpecContainer = document.getElementById('external-specializations');
+            externalSpecContainer.innerHTML = '';
+            Object.keys(courseData.externalSpecializations).forEach(specName => {
+                const specDiv = document.createElement('div');
+                specDiv.className = 'major-section';
+                
+                const specTitle = document.createElement('div');
+                specTitle.className = 'major-title';
+                specTitle.textContent = specName;
+                specDiv.appendChild(specTitle);
+                
+                const unitsGrid = document.createElement('div');
+                unitsGrid.className = 'units-grid';
+                
+                courseData.externalSpecializations[specName].forEach(unit => {
+                    unitsGrid.appendChild(createUnitCard(unit));
+                });
+                
+                specDiv.appendChild(unitsGrid);
+                externalSpecContainer.appendChild(specDiv);
+            });
+
+            // Load option units
+            const optionContainer = document.getElementById('option-units');
+            optionContainer.innerHTML = '';
+            courseData.optionUnits.forEach(unit => {
+                optionContainer.appendChild(createUnitCard(unit));
+            });
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            setMode('selected');
+            loadUnits();
+            updateSummaryStats();
+        });
+    </script>
+</body>
+</html>
